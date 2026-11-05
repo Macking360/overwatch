@@ -1,5 +1,7 @@
 # OverWatch — defensive host-integrity monitor
 
+[![CI](https://github.com/Macking360/overwatch/actions/workflows/ci.yml/badge.svg)](https://github.com/Macking360/overwatch/actions/workflows/ci.yml)
+
 OverWatch watches the things attackers quietly change — **files**, **running
 processes**, and the **registry autorun keys** that make programs start at boot
 — and records every change to a local, timestamped activity log. It runs on a
