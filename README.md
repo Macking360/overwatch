@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/overwatch-banner.jpg" alt="MACKING360 OverWatch" width="100%">
+</p>
+
 # OverWatch — defensive host-integrity monitor
 
 [![CI](https://github.com/Macking360/overwatch/actions/workflows/ci.yml/badge.svg)](https://github.com/Macking360/overwatch/actions/workflows/ci.yml)
