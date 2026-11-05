@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — OverWatch{% endblock %}
+{% block content %}
+<h2>Dashboard</h2>
+
+<section class="grid">
+  <div class="tile">
+    <h3>File watch</h3>
+    <p class="status {{ 'on' if status.file_watch else 'off' }}">
+      {{ 'active' if status.file_watch else 'idle' }}</p>
+    <p class="muted">{{ status.file_paths | length }} path(s)</p>
+  </div>
+  <div class="tile">
+    <h3>Process watch</h3>
+    <p class="status {{ 'on' if status.process_watch else 'off' }}">
+      {{ 'active' if status.process_watch else 'idle' }}</p>
+    <p class="muted">{{ 'supported' if status.process_supported else 'psutil missing' }}</p>
+  </div>
+  <div class="tile">
+    <h3>Registry watch</h3>
+    <p class="status {{ 'on' if status.registry_watch else 'off' }}">
+      {{ 'active' if status.registry_watch else 'idle' }}</p>
+    <p class="muted">{{ 'supported' if status.registry_supported else 'Windows only' }}</p>
+  </div>
+  <div class="tile">
+    <h3>Alerts</h3>
+    <p class="status {{ 'on' if status.alerts_enabled else 'off' }}">
+      {{ 'webhook set' if status.alerts_enabled else 'disabled' }}</p>
+    <p class="muted">poll {{ status.poll_interval }}s</p>
+  </div>
+  <div class="tile">
+    <h3>Heartbeat</h3>
+    <p class="status {{ 'on' if status.heartbeat else 'off' }}">
+      {{ 'active' if status.heartbeat else 'idle' }}</p>
+    <p class="muted">{{ status.heartbeat_interval | round(0) | int }}s interval</p>
+  </div>
+  <div class="tile">
+    <h3>Transport</h3>
+    <p class="status {{ 'on' if config.tls_enabled else 'off' }}">
+      {{ 'TLS on' if config.tls_enabled else 'plain http' }}</p>
+    <p class="muted">{{ 'mTLS client' if config.mtls_client else ('pinned CA' if config.pinned_ca else 'no client cert') }}</p>
+  </div>
+</section>
+
+<section>
+  <h3>Event totals</h3>
+  <p id="live-counts">
+    {% for sev in ['critical', 'warning', 'notice', 'info'] %}
+      <span class="sev sev-{{ sev }}">{{ sev }}: <span data-count="{{ sev }}">{{ counts.get(sev, 0) }}</span></span>
+    {% endfor %}
+  </p>
+</section>
+
+<section>
+  <div class="row-between">
+    <h3>Recent activity</h3>
+    <label class="toggle"><input type="checkbox" id="auto-refresh" checked> live</label>
+  </div>
+  <div id="live-events">
+    {% include "_events_table.html" %}
+  </div>
+  <p><a href="{{ url_for('events') }}">Full activity log &rarr;</a></p>
+</section>
+
+<script src="{{ url_for('static', filename='overwatch.js') }}"></script>
+
+{% if is_admin %}
+<section>
+  <a class="btn" href="{{ url_for('monitor') }}">Configure monitors</a>
+</section>
+{% endif %}
+{% endblock %}

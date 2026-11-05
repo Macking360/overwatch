@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Devices — OverWatch{% endblock %}
+{% block content %}
+<h2>Devices (BYOD fleet)</h2>
+<p class="hint">Enrolled devices run the OverWatch agent and forward their events
+   here. Each device has its own token; revoke a device to cut it off instantly.</p>
+
+{% if issued_token %}
+<section class="card callout">
+  <h3>Token for &ldquo;{{ issued_name }}&rdquo;</h3>
+  <p class="muted">Copy this now — it is shown only once and cannot be recovered.</p>
+  <pre class="code" id="issued">{{ issued_token }}</pre>
+  <p class="muted">On the device, run:</p>
+  <pre class="code">python -m overwatch agent --server http://THIS_HOST:{{ port }} \
+  --device-token {{ issued_token }} --name "{{ issued_name }}" --watch-process --watch-registry</pre>
+</section>
+{% endif %}
+
+<section class="card">
+  <h3>Enroll a device</h3>
+  <form method="post" action="{{ url_for('devices_create') }}" class="stack">
+    {{ csrf_field() }}
+    <label>Device name <input type="text" name="name" placeholder="sales-laptop" required></label>
+    <label>Platform <input type="text" name="platform" placeholder="Windows 11"></label>
+    <button class="btn" type="submit">Enroll device &amp; mint token</button>
+  </form>
+  <p class="muted">Or let a device self-enroll with the shared enroll key:</p>
+  <pre class="code">{{ enroll_key }}</pre>
+</section>
+
+<table class="events">
+  <thead><tr><th>ID</th><th>Name</th><th>Platform</th><th>Fingerprint</th><th>Status</th><th>Enrolled</th><th>Last seen</th><th>Actions</th></tr></thead>
+  <tbody>
+    {% for d in devices %}
+      <tr>
+        <td>{{ d['id'] }}</td>
+        <td>{{ d['name'] }}</td>
+        <td class="muted">{{ d['platform'] or '—' }}</td>
+        <td>
+          {% if d['fingerprint'] %}
+            <details><summary class="muted">view</summary><pre class="code">{{ d['fingerprint'] }}</pre></details>
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td><span class="status {{ 'on' if d['status'] == 'active' else 'off' }}">{{ d['status'] }}</span></td>
+        <td class="mono muted">{{ d['enrolled_at'] }}</td>
+        <td class="mono muted">{{ d['last_seen'] or 'never' }}</td>
+        <td class="actions">
+          {% if d['status'] == 'active' %}
+            <form method="post" action="{{ url_for('devices_status', device_id=d['id']) }}" class="inline">
+              {{ csrf_field() }}
+              <input type="hidden" name="status" value="revoked">
+              <button class="btn btn-sm btn-danger" type="submit">Revoke</button>
+            </form>
+          {% else %}
+            <form method="post" action="{{ url_for('devices_status', device_id=d['id']) }}" class="inline">
+              {{ csrf_field() }}
+              <input type="hidden" name="status" value="active">
+              <button class="btn btn-sm" type="submit">Re-activate</button>
+            </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('devices_delete', device_id=d['id']) }}" class="inline"
+                onsubmit="return confirm('Remove {{ d['name'] }}?');">
+            {{ csrf_field() }}
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="muted">No devices enrolled yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

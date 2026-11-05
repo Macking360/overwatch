@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Help &amp; introduction — OverWatch{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>What OverWatch is</h1>
+  <p class="lead">OverWatch is a <strong>defensive host-integrity monitor</strong>.
+     It watches the things attackers quietly change — files, running processes,
+     and the registry keys that make programs start at boot — and writes every
+     change to a tamper-evident activity log. You can run it on one machine or
+     across a fleet of enrolled devices.</p>
+  <p class="callout">It is <strong>read-only</strong> with respect to your
+     system. It detects and records; it never hides files or processes and never
+     edits the registry.</p>
+</section>
+
+<section class="card">
+  <h2>The three monitors</h2>
+  <div class="help-grid">
+    <div><span class="chip sev-notice">Files</span>
+      <p>Watches specific file paths and reports when they are created, modified,
+         moved, or deleted — handy for config files, host files, startup folders.</p></div>
+    <div><span class="chip sev-notice">Processes</span>
+      <p>Snapshots running processes every few seconds and reports what started
+         or exited. Read-only — it never kills anything.</p></div>
+    <div><span class="chip sev-warning">Registry autoruns</span>
+      <p>On Windows, reads the HKLM/HKCU <code>Run</code> and <code>RunOnce</code>
+         keys and flags any new, changed, or removed autostart entry.</p></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Accounts &amp; permissions</h2>
+  <ul>
+    <li><span class="role role-admin">admin</span> — full read/write: configure
+      monitors, enroll devices, and manage accounts.</li>
+    <li><span class="role role-viewer">viewer</span> — read-only: dashboard and
+      activity log.</li>
+  </ul>
+  <p class="muted">The first account created is always an admin. After that,
+     admins create accounts from the Users page.</p>
+</section>
+
+<section class="card">
+  <h2>BYOD network integration</h2>
+  <p>Run one OverWatch as the <strong>central server</strong>. Any other device —
+     laptop, workstation, VM — enrolls as an <strong>agent</strong> and forwards
+     its events to the server over the network, so the whole fleet shows up in
+     one activity log.</p>
+  <ol>
+    <li>On the server, open <strong>Devices</strong> and copy the enroll key (or
+      click <em>Enroll device</em> to mint a token directly).</li>
+    <li>On the device, run the agent:</li>
+  </ol>
+  <pre class="code">python -m overwatch agent \
+  --server http://SERVER_HOST:{{ config.port }} \
+  --enroll-key YOUR_ENROLL_KEY \
+  --name "sales-laptop" \
+  --watch-process --watch-registry \
+  --watch-file "C:\Windows\System32\drivers\etc\hosts"</pre>
+  <p class="muted">The agent enrolls once, caches its device token, keeps a local
+     log, and streams events to the server. Revoke any device from the Devices
+     page and its token stops working immediately.</p>
+</section>
+
+<section class="card">
+  <h2>Command line</h2>
+  <pre class="code">python -m overwatch run                      # start the server/UI
+python -m overwatch create-user NAME --role admin
+python -m overwatch agent --server URL --enroll-key KEY --name NAME ...
+python -m overwatch status                   # show resolved config</pre>
+  <p class="muted">Alerts are opt-in: set <code>OVERWATCH_ALERT_WEBHOOK</code> and
+     warning/critical events are POSTed there.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+<table class="events">
+  <thead>
+    <tr><th>Time (UTC)</th><th>Source</th><th>Monitor</th><th>Severity</th><th>Action</th><th>Target</th><th>Detail</th></tr>
+  </thead>
+  <tbody>
+    {% for e in events %}
+      <tr class="sev-row-{{ e['severity'] }}">
+        <td class="mono">{{ e['ts'] }}</td>
+        <td><span class="src">{{ e['source'] }}</span></td>
+        <td>{{ e['monitor'] }}</td>
+        <td><span class="sev sev-{{ e['severity'] }}">{{ e['severity'] }}</span></td>
+        <td>{{ e['action'] }}</td>
+        <td class="mono">{{ e['target'] }}</td>
+        <td class="mono muted">{{ e['detail'] }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="muted">No events recorded yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

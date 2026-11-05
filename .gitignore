@@ -1,0 +1,10 @@
+instance/
+*.db
+*.db-wal
+*.db-shm
+activity.log
+secret_key
+enroll_key
+device_token
+__pycache__/
+*.pyc

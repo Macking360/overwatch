@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Users — OverWatch{% endblock %}
+{% block content %}
+<h2>Users</h2>
+<p class="hint">Admins have full read/write: they configure monitors and manage
+   accounts. Viewers can read the dashboard and activity log only.</p>
+
+<table class="events">
+  <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Identity (PID)</th><th>Created</th><th>Actions</th></tr></thead>
+  <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u['id'] }}</td>
+        <td>{{ u['username'] }}</td>
+        <td><span class="role role-{{ u['role'] }}">{{ u['role'] }}</span></td>
+        <td class="mono">
+          {% if u['pid'] %}
+            <a href="{{ url_for('user_credential', user_id=u['id']) }}">{{ u['pid'] }}</a>
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td class="mono muted">{{ u['created_at'] }}</td>
+        <td class="actions">
+          <form method="post" action="{{ url_for('users_set_role', user_id=u['id']) }}" class="inline">
+            {{ csrf_field() }}
+            <select name="role">
+              {% for r in roles %}
+                <option value="{{ r }}" {{ 'selected' if r == u['role'] }}>{{ r }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-sm" type="submit">Set role</button>
+          </form>
+          <form method="post" action="{{ url_for('users_set_password', user_id=u['id']) }}" class="inline">
+            {{ csrf_field() }}
+            <input type="password" name="password" placeholder="new password" required>
+            <button class="btn btn-sm" type="submit">Reset</button>
+          </form>
+          <form method="post" action="{{ url_for('users_delete', user_id=u['id']) }}" class="inline"
+                onsubmit="return confirm('Delete {{ u['username'] }}?');">
+            {{ csrf_field() }}
+            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<section class="card">
+  <h3>Create user</h3>
+  <form method="post" action="{{ url_for('users_create') }}" class="stack">
+    {{ csrf_field() }}
+    <label>Username <input type="text" name="username" required></label>
+    <label>Password <input type="password" name="password" required></label>
+    <label>Role
+      <select name="role">
+        {% for r in roles %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="btn" type="submit">Create</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Activity log — OverWatch{% endblock %}
+{% block content %}
+<h2>Activity log</h2>
+<p class="filters">
+  Filter:
+  <a href="{{ url_for('events') }}" class="{{ 'active' if not monitor }}">all</a>
+  <a href="{{ url_for('events', monitor='file') }}" class="{{ 'active' if monitor == 'file' }}">file</a>
+  <a href="{{ url_for('events', monitor='process') }}" class="{{ 'active' if monitor == 'process' }}">process</a>
+  <a href="{{ url_for('events', monitor='registry') }}" class="{{ 'active' if monitor == 'registry' }}">registry</a>
+  <a href="{{ url_for('events', monitor='heartbeat') }}" class="{{ 'active' if monitor == 'heartbeat' }}">heartbeat</a>
+</p>
+<p class="row-between">
+  <a class="btn btn-sm btn-ghost" href="{{ url_for('events_csv') }}">Export CSV</a>
+  {% if is_admin %}
+  <form method="post" action="{{ url_for('events_clear') }}" class="inline"
+        onsubmit="return confirm('Clear the entire activity log?');">
+    {{ csrf_field() }}
+    <button class="btn btn-sm btn-danger" type="submit">Clear log</button>
+  </form>
+  {% endif %}
+</p>
+{% include "_events_table.html" %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Monitors — OverWatch{% endblock %}
+{% block content %}
+<h2>Configure monitors</h2>
+<p class="hint">All monitors are read-only. OverWatch records changes; it does not
+   alter files, processes, or the registry.</p>
+
+<section class="card">
+  <h3>File integrity</h3>
+  <form method="post" class="stack">
+    {{ csrf_field() }}
+    <input type="hidden" name="action" value="watch_file">
+    <label>File path to watch
+      <input type="text" name="file_path" placeholder="C:\path\to\file.ext" required>
+    </label>
+    <button class="btn" type="submit">Watch file</button>
+  </form>
+  {% if status.file_paths %}
+    <p class="muted">Watching:</p>
+    <ul class="mono">
+      {% for p in status.file_paths %}<li>{{ p }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h3>Processes</h3>
+  <p class="muted">
+    {% if status.process_supported %}Snapshot + diff every {{ status.poll_interval }}s.
+    {% else %}psutil is not installed; process monitoring is unavailable.{% endif %}
+  </p>
+  <form method="post" class="inline">
+    {{ csrf_field() }}
+    <input type="hidden" name="action" value="watch_process">
+    <button class="btn" type="submit" {{ 'disabled' if not status.process_supported }}>
+      {{ 'Re-baseline' if status.process_watch else 'Enable' }} process watch</button>
+  </form>
+  <span class="status {{ 'on' if status.process_watch else 'off' }}">
+    {{ 'active' if status.process_watch else 'idle' }}</span>
+</section>
+
+<section class="card">
+  <h3>Registry autoruns</h3>
+  <p class="muted">
+    {% if status.registry_supported %}Reads the HKLM/HKCU Run &amp; RunOnce keys and
+      diffs against the stored baseline.
+    {% else %}Registry monitoring requires Windows; enabling it here is a no-op.{% endif %}
+  </p>
+  <form method="post" class="inline">
+    {{ csrf_field() }}
+    <input type="hidden" name="action" value="watch_registry">
+    <button class="btn" type="submit">
+      {{ 'Re-baseline' if status.registry_watch else 'Enable' }} registry watch</button>
+  </form>
+  <span class="status {{ 'on' if status.registry_watch else 'off' }}">
+    {{ 'active' if status.registry_watch else 'idle' }}</span>
+</section>
+
+<section class="card">
+  <h3>Stop</h3>
+  <form method="post" class="inline" onsubmit="return confirm('Stop all monitoring?');">
+    {{ csrf_field() }}
+    <input type="hidden" name="action" value="stop_all">
+    <button class="btn btn-danger" type="submit">Stop all monitoring</button>
+  </form>
+</section>
+{% endblock %}

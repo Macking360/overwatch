@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}OverWatch{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>OverWatch</h1>
+  <p>A defensive host-integrity monitor. It watches files, processes, and
+     registry autorun keys on this machine and records every change to a local
+     activity log. It observes only — it never hides or modifies anything.</p>
+  <p>
+    <a class="btn" href="{{ url_for('login') }}">Login</a>
+    <a class="btn btn-ghost" href="{{ url_for('register') }}">Register</a>
+    <a class="btn btn-ghost" href="{{ url_for('help_page') }}">How it works</a>
+  </p>
+</section>
+
+<section class="grid">
+  <div class="tile"><h3>Files</h3><p>Change-detection on the paths you choose.</p></div>
+  <div class="tile"><h3>Processes</h3><p>See what starts and exits, read-only.</p></div>
+  <div class="tile"><h3>Registry</h3><p>Autorun keys watched for tampering.</p></div>
+  <div class="tile"><h3>Fleet</h3><p>Enroll BYOD devices into one log.</p></div>
+</section>
+{% endblock %}
+{% endblock %}

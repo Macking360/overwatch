@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OverWatch{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='overwatch.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">OverWatch</a>
+    <nav>
+      {% if current_user %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('events') }}">Activity log</a>
+        {% if is_admin %}
+          <a href="{{ url_for('monitor') }}">Monitors</a>
+          <a href="{{ url_for('devices_page') }}">Devices</a>
+          <a href="{{ url_for('users') }}">Users</a>
+        {% endif %}
+        <a href="{{ url_for('help_page') }}">Help</a>
+        <span class="who">{{ current_user['username'] }}
+          <span class="role role-{{ current_user['role'] }}">{{ current_user['role'] }}</span>
+        </span>
+        <a href="{{ url_for('logout') }}">Sign out</a>
+      {% else %}
+        <a href="{{ url_for('help_page') }}">Help</a>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    OverWatch {{ app_version }} · defensive host-integrity monitor · read-only
+  </footer>
+</body>
+</html>
