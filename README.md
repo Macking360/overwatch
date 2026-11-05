@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/overwatch-banner.jpg" alt="MACKING360 OverWatch" width="100%">
+  <img src="docs/overwatch-banner.gif" alt="MACKING360 OverWatch" width="100%">
 </p>
 
 # OverWatch — defensive host-integrity monitor
